@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarian Login - Library Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 400px;
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .info {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 10px;
+            text-align: center;
+            display: block;
+            font-style: italic;
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+    </style>
+    <script>
+        // Check if there's an error message in the URL
+        function showError() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const error = urlParams.get('error');
+            let errorMessage = '';
+
+            if (error === '1') {
+                errorMessage = 'Invalid username or password.';
+            } else if (error === '2') {
+                errorMessage = 'Database connection error. Please try again later.';
+            }
+
+            if (errorMessage) {
+                document.getElementById('error-message').textContent = errorMessage;
+                document.getElementById('error-message').style.display = 'block';
+
+                // Hide the error message after 5 seconds
+                setTimeout(() => {
+                    document.getElementById('error-message').style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Call the showError function when the page loads
+        window.onload = showError;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h2>Librarian Login</h2>
+        <form action="librarian-login.php" method="POST">
+            <input type="text" name="username" placeholder="Enter Username" required>
+            <input type="password" name="password" placeholder="Enter Password" required>
+            <span class="info">Contact administration for login credentials</span>
+            <button type="submit">Login</button>
+        </form>
+        <a href="index.html">Back to Home</a>
+
+        <!-- Error message section -->
+        <div id="error-message" class="error-message" style="display: none;"></div>
+    </div>
+</body>
+</html>

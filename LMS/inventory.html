@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Inventory</title>
+    <link rel="stylesheet" href="style.css">
+ <style>
+        /* Styling for the form */
+        #addBookForm, #updateBookForm {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        button:hover {
+            background-color: #218838;
+        }
+        
+        /* Styling for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .main-content h2, .main-content h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Manage Inventory</h1>
+        <button id="logoutBtn"onclick="window.location.href='librarian-login.html'">Logout</button>
+    </div>
+
+    <div class="container">
+        <div class="sidebar"> <button onclick="window.location.href='librarian-dashboard.html'">Dashboard</button>
+            <button onclick="window.location.href='inventory.html'">Manage Books</button>
+            <button onclick="window.location.href='members.html'">Manage Members</button>
+            <button onclick="window.location.href='borrowReturn.html'">Issue/Return</button>
+        </div>
+
+        <div class="main-content">
+        <h3>Add New Book</h3>
+        <form id="addBookForm" onsubmit="addBook(event)">
+            <label for="title">Title:</label>
+            <input type="text" id="title" required>
+            
+            <label for="author">Author:</label>
+            <input type="text" id="author" required>
+            
+            <label for="genre">Genre:</label>
+            <input type="text" id="genre" required>
+            
+            <button type="submit">Add Book</button>
+        </form>
+
+        <div id="updateBookForm" style="display:none;">
+            <h3>Update Book</h3>
+            <label for="updateTitle">Title:</label>
+            <input type="text" id="updateTitle" required>
+            
+            <label for="updateAuthor">Author:</label>
+            <input type="text" id="updateAuthor" required>
+            
+            <label for="updateGenre">Genre:</label>
+            <input type="text" id="updateGenre" required>
+            
+            <button onclick="submitUpdate()">Update Book</button>
+        </div>
+
+        <h2>Available Books</h2>
+        <table>
+            <thead>
+                <tr>
+	<th>Book ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Genre</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="inventoryTable">
+                <!-- Existing books will load here from the database -->
+            </tbody>
+        </table>
+    </div>
+
+    <script src="script.js"></script>
+<script>
+        // Fetch all books from the database on page load
+        window.onload = function() {
+            fetch('fetch_books.php')
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById('inventoryTable');
+                    data.forEach(book => {
+                        const newRow = table.insertRow();
+                        newRow.innerHTML = `
+	         <td>${book.id}</td>
+                            <td>${book.title}</td>
+                            <td>${book.author}</td>
+                            <td>${book.genre}</td>
+                            <td>
+                                <button onclick="openUpdateForm('${book.title}', '${book.author}', '${book.genre}')">Update</button>
+                                <button onclick="deleteBook('${book.title}')">Delete</button>
+                            </td>
+                        `;
+                    });
+                });
+        }
+    </script>
+</body>
+</html>

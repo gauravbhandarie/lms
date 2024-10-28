@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Members</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styling for the form */
+        #addMemberForm, #updatememberForm {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        button:hover {
+            background-color: #218838;
+        }
+        
+        /* Styling for the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+        
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        .main-content h2, .main-content h3 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Manage Members</h1>
+        <button id="logoutBtn" onclick="window.location.href='librarian-login.html'">Logout</button>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+             <button onclick="window.location.href='librarian-dashboard.html'">Dashboard</button>
+            <button onclick="window.location.href='inventory.html'">Manage Books</button>
+            <button onclick="window.location.href='members.html'">Manage Members</button>
+            <button onclick="window.location.href='borrowReturn.html'">Issue/Return</button>
+        </div>
+
+        <div class="main-content">
+            <h3>Add New Member</h3>
+            <form id="addMemberForm" method="POST" action="add_member.php">
+                <label for="memberName">Username</label>
+                <input type="text" id="username" name="name" required>
+
+                <label for="memberEmail">Email</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="memberPassword">Password</label>
+                <input type="password" id="password" name="password" required>
+
+                <button type="submit">Add Member</button>
+            </form>
+
+            <div id="alert" style="display: none; margin-top: 10px; padding: 10px; border-radius: 5px;"></div>
+
+<div id="updateMemberForm" style="display:none;">
+    <h3>Update Member</h3>
+    <form id="updatememberForm" onsubmit="event.preventDefault(); submitUpdateForm();">
+        <input type="hidden" id="updateMemberId" name="id">
+        
+        <label for="updateMemberName">Username:</label>
+        <input type="text" id="updateMemberName" name="name" required>
+
+        <label for="updateMemberEmail">Email:</label>
+        <input type="email" id="updateMemberEmail" name="email" required>
+
+        <label for="updateMemberPassword">New Password:</label>
+        <input type="password" id="updateMemberPassword" name="password" placeholder="Leave blank to keep current password">
+
+        <button onclick="submitUpdatemember">Update Member</button>
+    </form>
+</div>
+
+
+            <h2>Current Members</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Member ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="membersTable">
+                    <!-- Member data will be dynamically loaded here from the database -->
+                </tbody>
+            </table>
+
+            
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('addMemberForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const xhr = new XMLHttpRequest();
+
+            xhr.open('POST', 'add_member.php', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        const alertDiv = document.getElementById('alert');
+                        alertDiv.style.display = 'none';
+
+                        if (response.error) {
+                            alertDiv.textContent = response.error;
+                            alertDiv.style.display = 'block';
+                            alertDiv.style.backgroundColor = 'red';
+                            setTimeout(() => {
+                                alertDiv.style.display = 'none';
+                            }, 5000);
+                        } else if (response.success) {
+                            alertDiv.textContent = response.success;
+                            alertDiv.style.display = 'block';
+                            alertDiv.style.backgroundColor = 'green';
+                            setTimeout(() => {
+                                location.reload();
+                            }, 2000);
+                        }
+                    } catch (e) {
+                        console.error("Error parsing response:", e);
+                    }
+                }
+            };
+            xhr.send(formData);
+        });
+
+        window.onload = function() {
+            fetch('fetch_member.php')
+                .then(response => response.json())
+                .then(data => {
+                    const table = document.getElementById('membersTable');
+                    data.forEach(user => {
+                        const newRow = table.insertRow();
+                        newRow.innerHTML = `
+                            <td>${user.id}</td>
+                            <td>${user.username}</td>
+                            <td>${user.email}</td>
+                            <td>
+                                <button onclick="openUpdateForm('${user.id}', '${user.username}', '${user.email}', '${user.status}')">Update</button>
+                                <button onclick="deleteMember('${user.id}')">Delete</button>
+                            </td>
+                        `;
+                    });
+                });
+        }
+
+function submitUpdateForm() {
+    const id = document.getElementById('updateMemberId').value;
+    const username = document.getElementById('updateMemberName').value;
+    const email = document.getElementById('updateMemberEmail').value;
+    const password = document.getElementById('updateMemberPassword').value;
+
+    const formData = new FormData();
+    formData.append('id', id);
+    formData.append('username', username);
+    formData.append('email', email);
+    formData.append('password', password);
+
+    fetch('update_member.php', {
+        method: 'POST',
+        body: formData,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Member updated successfully!');
+location.reload();
+            // Hide the update form or refresh member list, if applicable
+            document.getElementById('updateMemberForm').style.display = 'none';
+        } else {
+            alert('Failed to update member: ' + data.message);
+location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating the member.');
+    });
+}
+
+// Function to open and populate the update form with password field
+function openUpdateForm(id, name, email) {
+window.location.hash ='updateMemberForm';
+    document.getElementById('updateMemberForm').style.display = 'block';
+    document.getElementById('updateMemberId').value = id;
+    document.getElementById('updateMemberName').value = name;
+    document.getElementById('updateMemberEmail').value = email;
+    document.getElementById('updateMemberPassword').value = ''; // Leave blank for new password
+}
+
+
+
+
+// Function to handle member deletion
+// Function to handle member deletion with default JS alert
+
+function deleteMember(id) {
+    if (confirm("Are you sure you want to delete this member?")) {
+        fetch(`delete_member.php?id=${id}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    location.reload();
+                } else {
+                    // Display the actual error message from the server
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                alert('An error occurred: ' + error);
+            });
+    }
+}
+
+
+
+
+    </script>
+</body>
+</html>

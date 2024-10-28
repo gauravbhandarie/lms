@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Library Management System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            width: 400px;
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            position: relative; /* Positioning for the alert */
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .alert {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background-color: green;
+            color: white;
+            text-align: center;
+            display: none; /* Initially hidden */
+            border-radius: 5px;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #2196F3;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Sign Up</h2>
+        <div id="alert" class="alert"></div> <!-- Alert Div -->
+        <form id="signupForm">
+            <input type="text" name="username" placeholder="Enter Username" required>
+            <input type="email" name="email" placeholder="Enter Email" required>
+            <input type="password" name="password" placeholder="Enter Password" required>
+            <button type="submit">Sign Up</button>
+        </form>
+        <a href="index.html">Back to Home</a>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(this);
+            const xhr = new XMLHttpRequest();
+
+            xhr.open('POST', 'signup.php', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    const response = JSON.parse(xhr.responseText);
+                    const alertDiv = document.getElementById('alert');
+
+                    // Clear any previous messages
+                    alertDiv.style.display = 'none';
+
+                    if (response.error) {
+                        alertDiv.textContent = response.error;
+                        alertDiv.style.display = 'block';
+                        alertDiv.style.backgroundColor = 'red'; // Alert in red for errors
+                        setTimeout(() => {
+                            alertDiv.style.display = 'none'; // Hide after 5 seconds
+                        }, 5000);
+                    } else if (response.success) {
+                        alertDiv.textContent = response.success;
+                        alertDiv.style.display = 'block';
+                        alertDiv.style.backgroundColor = 'green'; // Alert in green for success
+                        setTimeout(() => {
+                            window.location.href = 'member-login.html'; // Redirect to login
+                        }, 200);
+                    }
+                }
+            };
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>

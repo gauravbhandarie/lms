@@ -1,0 +1,130 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom right, #e3f2fd, #bbdefb);
+    color: #333;
+}
+
+.navbar {
+    background-color: #1565c0;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar h1 {
+    font-size: 24px;
+}
+
+.navbar button {
+    background-color: white;
+    color: #1565c0;
+    border: none;
+    padding: 8px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.navbar button:hover {
+    background-color: #e0e0e0;
+}
+
+.container {
+    display: flex;
+}
+
+.sidebar {
+    background-color: #1e88e5;
+    color: white;
+    width: 240px;
+    padding: 30px 20px;
+    height: 100vh;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar button {
+    background-color: #bbdefb;
+    color: #1565c0;
+    border: none;
+    width: 100%;
+    padding: 15px;
+    margin: 15px 0;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: left;
+    transition: all 0.3s ease;
+}
+
+.sidebar button:hover {
+    background-color: #90caf9;
+    transform: scale(1.05);
+}
+
+.sidebar button.active {
+    background-color: #1565c0;
+    color: white;
+    font-size: 21px;
+}
+
+.main-content {
+    padding: 30px;
+    width: 100%;
+}
+
+.section {
+    padding: 30px;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+h2 {
+    color: #1565c0;
+    font-size: 24px;
+    margin-bottom: 15px;
+}
+
+p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+}
+
+/* Buttons inside each section */
+.section button {
+    background-color: #1976d2;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin: 10px 5px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.section button:hover {
+    background-color: #1565c0;
+    transform: scale(1.03);
+}
+
+.section button:active {
+    background-color: #0d47a1;
+    transform: scale(0.98);
+}
+

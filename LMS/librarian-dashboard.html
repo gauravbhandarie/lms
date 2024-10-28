@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Librarian Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+<style>
+ .user-info {
+            text-align: center;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .user-info:hover {
+            transform: scale(1.05);
+        }
+        
+        #userMessage {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF; /* Blue color for emphasis */
+            margin-bottom: 15px;
+        }
+        
+        #currentTime {
+            font-size: 36px;
+            font-weight: bold;
+            color: #28a745; /* Green color for the current time */
+        }
+
+        @media (max-width: 600px) {
+            .user-info {
+                width: 90%;
+                padding: 20px;
+            }
+
+            #userMessage {
+                font-size: 20px;
+            }
+
+            #currentTime {
+                font-size: 30px;
+            }
+        }
+</style>
+
+
+<body>
+    <div class="navbar">
+        <h1>Librarian Dashboard</h1>
+        <button id="logoutBtn"onclick="window.location.href='librarian-login.html'">Logout</button>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+           <button onclick="window.location.href='librarian-dashboard.html'">Dashboard</button>
+            <button onclick="window.location.href='inventory.html'">Manage Books</button>
+            <button onclick="window.location.href='members.html'">Manage Members</button>
+            <button onclick="window.location.href='borrowReturn.html'">Issue/Return</button>
+        </div>
+
+        <div class="main-content">
+            <h2>Dashboard Overview</h2>
+            <div class="user-info">
+	
+
+        
+
+
+        
+        <p id="currentTime">Current Time: --:--:--</p>
+    </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+        // JavaScript to update the time
+       function updateTime() {
+                const now = new Date();
+                document.getElementById("current-time").textContent = now.toLocaleTimeString();
+            }
+            setInterval(updateTime, 1000); // Update every second
+
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

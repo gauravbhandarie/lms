@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Dashboard</title>
+    <link rel="stylesheet" href="member.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Fetch member data via AJAX
+            fetch('fetch-member-data.php')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        console.error('Error fetching member data:', data.error);
+                        document.getElementById("member-name").textContent = "Error loading name";
+                    } else {
+                        document.getElementById("member-name").textContent = data.name;
+                        document.getElementById("member-email").textContent = data.email;
+                        document.getElementById("borrowed-books-count").textContent = data.borrowed_books_count;
+
+                        // Handle notifications
+                        const notificationsList = document.getElementById("notifications-list");
+                        notificationsList.innerHTML = ''; // Clear any existing notifications
+                        data.notifications.forEach(notification => {
+                            const li = document.createElement("li");
+                            li.textContent = notification;
+                            notificationsList.appendChild(li);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching member data:', error));
+            
+            // Set current time
+            function updateTime() {
+                const now = new Date();
+                document.getElementById("current-time").textContent = now.toLocaleTimeString();
+            }
+            setInterval(updateTime, 1000); // Update every second
+
+            // Function to extend borrow limit without payment
+            document.getElementById("extend-limit-btn").addEventListener("click", function () {
+                alert("You can extend your borrow limit. Please contact the library staff.");
+            });
+        });
+
+        // Function to prevent borrowing more than the limit
+        function checkBorrowLimit() {
+            const borrowedCount = parseInt(document.getElementById("borrowed-books-count").textContent);
+            const borrowLimit = 10; // Set the borrow limit here
+            if (borrowedCount >= borrowLimit) {
+                alert("You have reached your borrow limit. Please return some books or extend your limit.");
+                return false; // Prevent borrowing
+            }
+            return true; // Allow borrowing
+        }
+    </script>
+    <style>
+        /* Additional styling for the extend button */
+        #extend-limit-btn {
+            margin-top: 10px;
+            background-color: #ff9933;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #extend-limit-btn:hover {
+            background-color: #cc7a29;
+        }
+
+        /* Time Section */
+        #time-section {
+            background-color: #f0f8f0;
+            padding: 15px;
+            border: 1px solid #3d993d;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        #time-section h3 {
+            color: #3d993d;
+            margin-bottom: 5px;
+        }
+
+        #current-time {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2e6e2e;
+        }
+
+        /* Notifications Section */
+        #notifications {
+            background-color: #fff7e6;
+            padding: 15px;
+            border: 1px solid #ffcc80;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        #notifications h3 {
+            color: #ff9933;
+        }
+
+        #notifications ul {
+            padding-left: 20px;
+        }
+
+        #notifications li {
+            color: #664d00;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* Reminders Section */
+        #reminders {
+            background-color: #e6f7ff;
+            padding: 15px;
+            border: 1px solid #80c1ff;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        #reminders h3 {
+            color: #3399ff;
+        }
+
+        #reminders p {
+            color: #003366;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>Welcome, <span id="member-name">Loading...</span>!</h1>
+            <nav>
+                <ul>
+                    <li><a href="books.php">Books</a></li>
+                    <li><a href="borrowed-books.php">Borrowed Books</a></li>
+                    <li><a href="profile.php">Profile</a></li>
+                    <li><a href="member-logout.php">Logout</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section id="content">
+            <h2>Dashboard Overview</h2>
+            <p>You are logged in as <span id="member-email">Loading...</span>.</p>
+            <p>Borrowed Books: <span id="borrowed-books-count">Loading...</span>.</p>
+        </section>
+
+        <!-- Current Time Section -->
+        <section id="time-section">
+            <h3>Current Time</h3>
+            <p id="current-time">Loading...</p>
+        </section>
+
+        <!-- Notifications Section -->
+        <section id="notifications">
+            <h3>Notifications</h3>
+            <ul id="notifications-list">
+               <p> The library will be closed for 5 days on Tihar</p>
+            </ul>
+        </section>
+
+        <!-- Reminder Section -->
+        <section id="reminders">
+            <h3>Reminders</h3>
+            <p>Don't forget to return borrowed books on time to avoid late fees.</p>
+        </section>
+
+        <footer>
+            <p>&copy; 2024 Library Management System</p>
+        </footer>
+    </div>
+</body>
+</html>

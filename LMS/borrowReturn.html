@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Issue/Return</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Styling for form inputs */
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+
+
+        button {
+	padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border: none;
+	border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        /* Autocomplete suggestion box styling */
+        .autocomplete-suggestions {
+            border: 1px solid #ddd;
+            background-color: white;
+            max-height: 150px;
+            overflow-y: auto;
+            position: absolute;
+            z-index: 9999;
+            width: 100%;
+            display: none; /* Hide by default */
+        }
+
+        .autocomplete-suggestion {
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .autocomplete-suggestion:hover {
+            background-color: #f2f2f2;
+        }
+
+        .main-content {
+            margin: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Alert messages */
+        .alert {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            display: none; /* Hide by default */
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <h1>Issue/Return</h1>
+       <button id="logoutBtn" onclick="window.location.href='librarian-login.html'">Logout</button>
+           </div>
+
+
+    <div class="container">
+        <div class="sidebar">
+             <button onclick="window.location.href='librarian-dashboard.html'">Dashboard</button>
+            <button onclick="window.location.href='inventory.html'">Manage Books</button>
+            <button onclick="window.location.href='members.html'">Manage Members</button>
+            <button onclick="window.location.href='borrowReturn.html'">Issue/Return</button>
+        </div>
+
+        <div class="main-content">
+            <h2>Issue/Return Book</h2>
+
+            <!-- Issue Book Section -->
+            <h3>Issue Book</h3>
+            <form id="issueBookForm" method="POST" action="issue_book.php">
+                <div class="form-group">
+                    <label for="bookName">Book Name</label>
+                    <input type="text" id="bookName" name="book_name" autocomplete="off" required>
+                    <div id="bookSuggestions" class="autocomplete-suggestions"></div>
+                </div>
+                <div class="form-group">
+                    <label for="bookId">Book ID</label>
+                    <input type="number" id="bookId" name="book_id" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="memberId">Member ID</label>
+                    <input type="number" id="memberId" name="member_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="issueDate">Issue Date</label>
+                    <input type="date" id="issueDate" name="issue_date" required>
+                </div>
+                <button type="submit">Issue Book</button>
+                <div id="issueMessage" class="alert"></div>
+            </form>
+
+            <!-- Return Book Section -->
+            <h3>Return Book</h3>
+            <form id="returnBookForm" method="POST" action="return_book.php">
+                <div class="form-group">
+                    <label for="returnBookName">Book Name</label>
+                    <input type="text" id="returnBookName" name="book_name" autocomplete="off" required>
+                    <div id="returnBookSuggestions" class="autocomplete-suggestions"></div>
+                </div>
+                <div class="form-group">
+                    <label for="returnBookId">Book ID</label>
+                    <input type="number" id="returnBookId" name="book_id" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="returnMemberId">Member ID</label>
+                    <input type="number" id="returnMemberId" name="member_id" required>
+                </div>
+                <div class="form-group">
+                    <label for="returnDate">Return Date</label>
+                    <input type="date" id="returnDate" name="return_date" required>
+                </div>
+                <button type="submit">Return Book</button>
+                <div id="returnMessage" class="alert"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleSuggestionsBox(suggestionsBox, display) {
+            suggestionsBox.style.display = display ? 'block' : 'none';
+        }
+
+        // Issue section - book name autocomplete and ID fetching
+        const bookNameInput = document.getElementById('bookName');
+        const bookIdInput = document.getElementById('bookId');
+        const suggestionsDiv = document.getElementById('bookSuggestions');
+
+        bookNameInput.addEventListener('input', function () {
+            const query = bookNameInput.value.trim();
+            if (query.length > 1) {
+                fetch(`search_books.php?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        suggestionsDiv.innerHTML = '';
+                        toggleSuggestionsBox(suggestionsDiv, data.length > 0);
+                        data.forEach(book => {
+                            const suggestionDiv = document.createElement('div');
+                            suggestionDiv.classList.add('autocomplete-suggestion');
+                            suggestionDiv.textContent = book.name;
+                            suggestionDiv.addEventListener('click', () => {
+                                bookNameInput.value = book.name;
+                                bookIdInput.value = book.id;
+                                suggestionsDiv.innerHTML = '';
+                                toggleSuggestionsBox(suggestionsDiv, false);
+                            });
+                            suggestionsDiv.appendChild(suggestionDiv);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching book suggestions:', error));
+            } else {
+                suggestionsDiv.innerHTML = '';
+                toggleSuggestionsBox(suggestionsDiv, false);
+            }
+        });
+
+        // Return section - book name autocomplete and ID fetching
+        const returnBookNameInput = document.getElementById('returnBookName');
+        const returnBookIdInput = document.getElementById('returnBookId');
+        const returnSuggestionsDiv = document.getElementById('returnBookSuggestions');
+
+        returnBookNameInput.addEventListener('input', function () {
+            const query = returnBookNameInput.value.trim();
+            if (query.length > 1) {
+                fetch(`search_books.php?query=${encodeURIComponent(query)}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        returnSuggestionsDiv.innerHTML = '';
+                        toggleSuggestionsBox(returnSuggestionsDiv, data.length > 0);
+                        data.forEach(book => {
+                            const suggestionDiv = document.createElement('div');
+                            suggestionDiv.classList.add('autocomplete-suggestion');
+                            suggestionDiv.textContent = book.name;
+                            suggestionDiv.addEventListener('click', () => {
+                                returnBookNameInput.value = book.name;
+                                returnBookIdInput.value = book.id;
+                                returnSuggestionsDiv.innerHTML = '';
+                                toggleSuggestionsBox(returnSuggestionsDiv, false);
+                            });
+                            returnSuggestionsDiv.appendChild(suggestionDiv);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching book suggestions:', error));
+            } else {
+                returnSuggestionsDiv.innerHTML = '';
+                toggleSuggestionsBox(returnSuggestionsDiv, false);
+            }
+        });
+
+      // Display alert messages on the same page
+const issueForm = document.getElementById('issueBookForm');
+const returnForm = document.getElementById('returnBookForm');
+const issueMessage = document.getElementById('issueMessage');
+const returnMessage = document.getElementById('returnMessage');
+
+// Function to show message for 5 seconds
+function displayMessage(messageElement, message, success) {
+    messageElement.className = success ? 'alert alert-success' : 'alert alert-error';
+    messageElement.textContent = message;
+    messageElement.style.display = 'block';
+
+    setTimeout(() => {
+        messageElement.style.display = 'none';
+    }, 5000); // Hide after 5 seconds
+}
+
+// Show message from localStorage if available
+window.addEventListener('load', function () {
+    const storedMessage = localStorage.getItem('alertMessage');
+    const isSuccess = localStorage.getItem('alertSuccess') === 'true';
+
+    if (storedMessage) {
+        displayMessage(issueMessage, storedMessage, isSuccess);
+        localStorage.removeItem('alertMessage');  // Clear message after displaying
+        localStorage.removeItem('alertSuccess');
+    }
+});
+
+// Issue form submission
+issueForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(issueForm);
+    fetch('issue_book.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Store the message and reload
+        localStorage.setItem('alertMessage', data.message);
+        localStorage.setItem('alertSuccess', data.success);
+        location.reload();
+    })
+    .catch(error => {
+        localStorage.setItem('alertMessage', 'An error occurred. Please try again.');
+        localStorage.setItem('alertSuccess', false);
+        location.reload();
+    });
+});
+
+// Return form submission
+returnForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const formData = new FormData(returnForm);
+    fetch('return_book.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Store the message and reload
+        localStorage.setItem('alertMessage', data.message);
+        localStorage.setItem('alertSuccess', data.success);
+        location.reload();
+    })
+    .catch(error => {
+        localStorage.setItem('alertMessage', 'An error occurred. Please try again.');
+        localStorage.setItem('alertSuccess', false);
+        location.reload();
+    });
+});
+
+    
+    </script>
+</body>
+</html>
